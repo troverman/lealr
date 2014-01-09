@@ -1,0 +1,92 @@
+{{extend 'layout.html'}}
+<style>
+
+#contentwrapper{
+    
+	width: 100%;
+	
+}    
+      
+
+#content { 
+
+        margin-left:250px;
+            
+}
+
+#left {
+    
+    float: left;
+    width:200px;
+	border-right:1px solid rgb(238,238,238);
+	border-bottom:1px solid rgb(238,238,238);
+	padding-left:15px;
+	padding-bottom:15px;    
+}
+</style>
+
+<div id="left">
+    <h4><a href="/account/content/">content</a></h4>
+    <h4><a href="/account/accounts/">connected accounts</a></h4>
+    <h4><a href="/account/general/">general info</a></h4>
+	<h4><a href="/account/notification/">notification settings</a></h4>
+    <h4><a href="/account/privacy/">privacy settings</a></h4>
+	<h4><a href="/account/promotions/">promotions</a></h4>
+</div>
+
+<div id="contentwrapper">
+    <div id="content">
+        <h1>Account</h1>
+        <p class="lead">{{=session.auth.user.username}}</p><hr>
+        
+        
+        {{if request.args(0) == 'general':}}
+
+		avatar
+
+		{{pass}}
+        
+        {{if request.args(0) == 'privacy':}}
+
+		privacy
+
+		{{pass}}
+        
+		{{if request.args(0) == 'notification':}}
+
+		notification
+
+		{{pass}}
+		{{if request.args(0) == 'accounts':}}
+
+        	Fb,twitter, g+, email
+			see friends
+			
+		{{pass}}
+		{{if request.args(0) == 'content':}}
+
+        	collections, comments, threads, tags, likes, dislikes
+			
+		{{pass}}
+		
+		{{if request.args(0) == 'promotions':}}
+
+        <h4>Promote</h4>
+            
+            promote thread
+            options?
+            create thread.. upload video/ picutre template... auto play options etc..
+            threads
+            comments
+            promotions
+			
+		{{pass}}
+
+    </div>
+</div>
+
+
+
+{{if request.args(0) == 'logout':}}
+	{{=auth.logout()}}
+{{pass}}

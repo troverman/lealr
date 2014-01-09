@@ -1,0 +1,72 @@
+{{extend 'layout.html'}}
+
+<style>
+
+#contentwrapper{
+    
+        //float: left;
+        width: 100%;
+        
+}    
+            
+#content { 
+
+        //margin: 0 280px 0 180px; /*Margins for content column. Should be "0 RightColumnWidth 0 LeftColumnWidth*/
+         
+}
+
+#right { 
+
+        float: right;
+        width: 255px;
+    	border-left:1px solid rgb(238,238,238);
+		border-bottom:1px solid rgb(238,238,238);
+        padding-left:15px;
+		padding-right:15px;
+		padding-bottom:15px;
+
+ 
+}
+
+#left {
+    
+        float: left;
+        width: 175px;
+    	border-right:1px solid rgb(238,238,238);
+		border-bottom:1px solid rgb(238,238,238);
+        padding-left:15px;
+		padding-bottom:15px;
+
+    
+}
+
+</style>
+
+<div id="left">
+	{{for collection in my_admin_collections:}}
+		<div style="background-color:rgb(150,240,255);padding-right:15px;">
+			<a style="">{{=collection['title']}}</a>
+			<a style="float:right;" class="close" id="close-ad-sidebar" href="#">&times;</a>
+		</div><br><br>
+	{{pass}}
+</div>
+
+<div id="right">
+    	
+    <button class="btn">+ new thread</button>
+    <button class="btn">+ new collection</button>
+            
+    <h4>collection tools</h4>
+    <h4>moderate</h4>
+
+</div>
+<div id="contentwrapper">
+    <div id="content">
+    
+        <h1>My Collections</h1><hr>     
+        {{for x in range(200):}}
+        	<a><h4>thread {{=x}}</h4></a>
+        {{pass}}
+    
+    </div>
+</div>

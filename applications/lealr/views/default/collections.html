@@ -1,0 +1,288 @@
+{{extend 'layout.html'}}
+<style>
+    .img-polaroid{padding:2px;}
+	a{cursor: pointer;}
+    #content { }
+    #right { 
+        width: 255px;
+        float: right;
+		padding-left:15px;
+		padding-right:15px; 
+    }
+    #left {
+        width: 175px; 
+        float: left;
+    	border-right:1px solid rgb(238,238,238);  
+		padding-left:15px;    
+    }
+    #collapsed-left {
+        float: left;
+		border-bottom:1px solid rgb(238,238,238);
+    	border-right:1px solid rgb(238,238,238);
+    	padding-left:7px;
+		padding-right:7px;
+    }
+    #collapsed-left:hover {
+            float: left;
+            padding-left:7px;
+            padding-right:7px;
+            background-color:rgb(245,245,248);
+            border-right:1px solid rgb(235,235,238);
+            border-bottom:1px solid rgb(235,235,238)
+    }
+    #collapse-left {
+            padding-left:5px;
+            padding-right:5px;
+            float:right;
+            border-left:1px solid rgb(238,238,238);
+            border-bottom:1px solid rgb(238,238,238);
+    }
+    #collapse-left:hover {
+            padding-left:5px;
+            padding-right:5px;
+            float:right;
+            background-color:rgb(245,245,248);
+            border-left:1px solid rgb(235,235,238);
+            border-bottom:1px solid rgb(235,235,238)
+    }
+    #collection-list-item:hover{background-color:rgb(248,248,248);}
+    .modal.fade {
+        top: 20%;
+        -webkit-transition: opacity 0.3s linear;
+        -moz-transition: opacity 0.3s linear;
+        -o-transition: opacity 0.3s linear;
+        transition: opacity 0.3s linear;
+    }
+    .modal.fade.in {
+      top: 20%;
+    }  
+    hr{margin:0px;}
+    
+</style>
+
+<script>
+//create_collection
+function onAddTag_collcetion(tag) {
+	ajax('ajax_add_tag_collection', ['collection_add_tag_form'], ':eval');
+}
+function onAddTag_sidebar(tag) {
+    ajax('ajax_add_tag_collection', ['collection_add_tag_form'], ':eval');
+}	
+	
+$(document).ready(function() {
+	$('#collection_add_tag_form').tagsInput({	
+         onAddTag:onAddTag_collcetion,
+         onRemoveTag:onAddTag_collcetion,
+        'defaultText':'tags',
+        'width':'auto',
+        'height':'auto'
+    });
+
+	$('#sidebar_add_tag_form').tagsInput({
+         onAddTag:onAddTag_sidebar,
+         onRemoveTag:onAddTag_sidebar,
+        'defaultText':'tags',
+        'width':'auto',
+        'height':'auto'	
+    });    
+
+	$("#close-promoted").click(function() {
+		$("#collection-notice").fadeToggle();	
+	});
+	
+	$("#close-ad").click(function() {		
+		$("#ad_block").fadeToggle();		
+	});
+	
+
+	$(".dark-tooltip").tooltip();
+ 	$(".light-tooltip").popover();
+ 	$("#collapse-left").click(function() {	
+		$("#left").fadeToggle(300);
+		$("#collapsed-left").delay(300).fadeToggle(300);
+		$('#collection-notice').delay(300).css('margin-top', '35px');
+        $('#collection-notice').css('margin-left', '15px');
+	});
+	$("#open-left").click(function() {	
+		$("#collapsed-left").fadeOut( 300 );	
+		$("#left").delay(300).fadeIn( 300 );	
+		$('#collection-notice').delay(300).css('margin-top', '10px');
+        $('#collection-notice').css('margin-left', '200px'); 
+	});
+    $('#collection-list').hover(function() {
+        $('#left').css('background-color', 'rgb(251, 251, 251)');
+        $('#right').css('background-color', 'rgb(251, 251, 251)');
+    }, 
+    function() {             
+    });
+});
+</script>
+<div id="collapsed-left" style="display:none;">
+    <a id="open-left">
+        <div style="">
+        	<h5 title="expand" style="margin:0px;padding:3px;"> >> </h5>
+        </div>
+    </a>
+</div>
+<div id="left">
+    <a id="collapse-left"> <h5 style="margin:0px;padding:3px;" title="minimize"> << </h5> </a>
+    <br><br>
+
+	<div style="margin-right:16px;" id="div_sidebar_add_tag"><input name = "sidebar_add_tag" type="text" id="sidebar_add_tag_form" /></div><br>   
+    <div class="dropdown" style="float:right;margin-right:15px;">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><b style="margin-right:5px;"class="caret"></b>sort</a>
+        <ul class="dropdown-menu pull-right" style="left:auto;width:158px;min-width:0px;" role="menu" aria-labelledby="dLabel">
+            <li><a tabindex="-1" href="#">Action</a></li>
+            <li><a tabindex="-1" href="#">Another action</a></li>
+            <li><a tabindex="-1" href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a tabindex="-1" href="#">Separated link</a></li>
+        </ul>
+    </div>
+    
+    <hr style="margin-top:10px;"><br>
+	<div id="tag-list">
+        {{for tag in reversed(tag_collection_list_sorted_by_total_count):}}
+            <div id="tag-list-item" style="margin-right:15px;font-family:ubuntu;">                         
+                <a href="/tags/{{=tag[0]}}" >{{=tag[0]}}</a>
+                <a style="color:rgb(210,210,210);" href="/tags/{{=tag[0]}}"> ( {{=tag[1]}} ) </a>
+                <a id="plus-{{=tag[0]}}" class="filter_tag_item" onclick="add_tag_sidebar('{{=tag[0]}}');" >+</a>                        
+                <script>
+                        function add_tag_sidebar(tag){
+                            if ($('#sidebar_add_tag_form').tagExist(tag)) {
+                                $('#sidebar_add_tag_form').removeTag(tag);
+                            }
+                            else{
+                                $('#sidebar_add_tag_form').addTag(tag);
+                            }
+                        }
+                    </script>
+            </div>
+        {{pass}}
+        <br>
+        <p style="text-align:center;"><a>view more</a></p>
+	</div>
+</div>
+
+<div id="right">
+	<br>
+	{{if auth.is_logged_in():}}
+    	<h3 style="text-align:center">
+    		<a style="padding:8px 24px" onclick="ajax('ajax_reset_collection_tags_session_thread_collection', [], ':eval');" class="btn" data-toggle="modal" href="#create-collection" >+ new collection</a>
+    	</h3>
+    	<br>
+    {{else:}}
+        <h3 style="text-align:center">
+            <a class="btn" data-toggle="modal" href="#login-or-signup" style="padding:8px 24px" >+ new collection</a>
+        </h3>
+        <br>
+    {{pass}}
+    <h4>Search</h4><hr><br>   
+    {{=FORM(INPUT(_name='search', requires=IS_NOT_EMPTY()))}}
+        
+    <div id="promoted_list">
+        <div style="border:1px solid rgb(235,235,235);background-color:rgb(246,250,255);padding:15px;" id="ad_block">
+            <a class="close" id="close-ad" href="#">&times;</a>
+            <div id="promoted_list">
+                {{for thread in promoted_thread_array:}}
+                <a href="/thread/{{=thread['url_title']}}"><h5>{{=thread['title']}}</h5></a>
+                {{pass}}          
+            </div>      
+        </div>
+    </div>
+</div>
+
+<div id="content" style="border-right:1px solid rgb(238,238,238);padding:5px;">
+	<div id="collection-notice" style="border:1px solid rgb(235,235,235);background-color:rgb(246,250,255);margin-left:200px;margin-right:295px;margin-top:10px;">
+		<div id="notice-content" style="padding:15px;">
+            <a class="close" id="close-promoted" href="#">&times;</a>
+                <h1>this is a promotion</h1><hr><BR>
+                <p class="lead">this is some content<p>
+        </div>
+    </div>
+	<div class="dropdown" style="float:left;margin-left:15px;">
+		<a class="dropdown-toggle" data-toggle="dropdown" href="#"><b style="margin-right:5px;"class="caret"></b>sort</a>
+		<ul class="dropdown-menu pull-right" style="left:auto;width:158px;min-width:0px;" role="menu" aria-labelledby="dLabel">
+			<li><a tabindex="-1" href="#">Action</a></li>
+			<li><a tabindex="-1" href="#">Another action</a></li>
+			<li><a tabindex="-1" href="#">Something else here</a></li>
+			<li class="divider"></li>
+			<li><a tabindex="-1" href="#">Separated link</a></li>
+		</ul>
+	</div><hr style="margin-top:10px;"><br>	
+	<br>
+    <div id="collection-list"><hr>
+        {{for collection in collection_list:}}
+            <div id = "collection-list-item" style="height:70px;"> 
+                <div style="float:left;margin-top:10px;margin-left:15px;">
+                    {{for picture in db(db.collection_picture.collection_id == collection['id']).select():}}
+                    <a style="float:left;"><img src="/download/{{=picture['picture']}}" style="height:44px;" class="img-polaroid" /></a>
+                    {{pass}}
+                </div>
+                <div style="float:left;margin-top:12px;max-width:60%;overflow:scroll;">
+                    <h4 style="font-family:ubuntu;font-size:20px;float:left;margin-left:15px;text-align:left;"><a href="/collection/{{=collection['title'].replace(" ","-")}}" class="dark-tooltip" data-placement="right" title="{{=collection['description']}}" >{{=collection['title']}}</a></h4>
+                </div>
+                <div style="float:right;margin-top:15px;margin-right:15px;">
+                    <h5 style="float:right;margin-right:10px;"><a href="/collection/{{=collection['title'].replace(" ","-")}}/members">{{=len(db(db.collection_member.collection_id == collection['id']).select())}}</a></h5>
+                    {{if session.auth is None:}}
+                        <a style="float:right;margin-right:10px;" data-toggle="modal" href="#login-or-signup"><h5>join</h5></a>     
+                    {{else:}}
+                        {{is_in_collection=db((db.collection_member.user_id==auth.user_id) & (db.collection_member.collection_id==collection['id'])).select()}}
+                        {{if not is_in_collection:}}
+                            <div class="collection-join" id="join-collection-{{=collection['id']}}" style="float:left;margin-right:10px;">
+                                <form style="display:none"><input type="hidden" id="" name="join-{{=collection['id']}}" value="{{=collection['id']}}" /></form> 
+                                <a onclick="ajax('ajax_join_collection', ['join-{{=collection['id']}}'], ':eval');">
+                                    <h5>join</h5>      
+                                </a>
+                            </div>
+                            <div class="collection-leave" id="leave-collection-{{=collection['id']}}" style="display:none;float:left;margin-right:10px;"> 
+                                <div> 
+                                    <form style="display:none;"><input type="hidden" name="leave-{{=collection['id']}}" value="{{=collection['id']}}" /></form>     
+                                    <a style="" onclick="ajax('ajax_leave_collection', ['leave-{{=collection['id']}}'], ':eval');">
+                                        <h5 style="">leave</h5>
+                                    </a>
+                                </div>
+                            </div>           
+                        {{else:}}
+                            <div class="collection-join" id="join-collection-{{=collection['id']}}" style="display:none;float:left;margin-right:10px;">
+                                <form style="display:none"><input type="hidden" id="" name="join-{{=collection['id']}}" value="{{=collection['id']}}" /></form> 
+                                <a onclick="ajax('ajax_join_collection', ['join-{{=collection['id']}}'], ':eval');">                        
+                                    <h5>join</h5>      
+                                </a>
+                            </div>                                                   
+                            <div class="collection-leave" id="leave-collection-{{=collection['id']}}" style="float:left;margin-right:10px;"> 
+                                <div> 
+                                    <form style="display:none;"><input type="hidden" name="leave-{{=collection['id']}}" value="{{=collection['id']}}" /></form>     
+                                    <a style="" onclick="ajax('ajax_leave_collection', ['leave-{{=collection['id']}}'], ':eval');">
+                                        <h5 style="">leave</h5>
+                                    </a>
+                                </div>
+                            </div>                             
+                        {{pass}}
+                    {{pass}}
+                </div>
+                <br><br>
+                <br>
+                      
+            </div>
+        <hr>
+        {{pass}}
+    </div>
+	<br><br>
+	<p class="lead" style="text-align:center;"><a>view more</a></p>
+</div>
+
+<div class="modal fade" id="create-collection" style="display:none;">
+  <div class="modal-header">
+      <a class="close" data-dismiss="modal">×</a>
+    <h3>Create Collection</h3>
+  </div>
+  <div class="modal-body">
+        <a href="#" data-toggle="tooltip" title="first tooltip">hover over me</a>
+        {{=form_create_collection}}
+        <input name="collection_add_tag_form" id="collection_add_tag_form" />
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-primary">Submit</a>
+  </div>
+</div>

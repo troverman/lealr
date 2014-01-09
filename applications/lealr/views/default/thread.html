@@ -1,0 +1,267 @@
+{{extend 'layout.html'}}
+<style>
+a{cursor: pointer;}    
+#content { 
+    
+	//width: 60%;
+	//float: right;
+	margin-left:15px;
+    
+}
+
+#right { 
+    
+    border-left:1px solid rgb(238,238,238);
+    width: 280px;
+    float: right;
+    
+}
+
+#left {
+        display:none;
+    border-right:1px solid rgb(238,238,238);
+    width: 175px; 
+    float: left;
+    
+}
+
+label#thread_comment_comment_content__label{display:none}
+    
+</style>
+
+
+
+
+<script>
+    $(document).ready(function() {
+           
+           
+        $(".dark-tooltip").tooltip();
+        $(".light-tooltip").popover();
+        
+        $("#close-promoted").click(function() {
+        
+            $("#index-notice").toggle();
+            
+        });
+        
+        $("#close-ad").click(function() {
+            
+            $("#ad_block").toggle();
+            
+        });    
+        
+   	});    
+ 
+    
+</script>
+<br>
+<div id="left">
+
+    <h1>tags</h1><hr>
+	<div>
+        {{for x in range(200):}}
+        
+        	<div>{{=x}}</div>
+        
+        {{pass}}
+    </div>
+
+
+</div>
+<div id="right">
+
+    <h5><a>like</a></h5>
+	<h5><a>dislike</a></h5>
+    <h5><a>0</a></h5>
+
+    <p>likes</p>
+    <p>dislikes</p>
+    <p>shares</p>
+    <p>views</p>
+    <p>comments</p>
+
+    
+    <ul style="float:left"class="nav nav-tabs" id="profile-tab" data-tabs="tabs">
+    <li class="active"><a href="#user-feed" data-toggle="tab">similar</a></li>
+    <li><a href="#user-content" data-toggle="tab">promoted</a></li>
+    <li><a href="#user-info" data-toggle="tab">collection</a></li>
+	</ul> 
+    <br><br>
+    <h2>similar threads</h2><hr>
+    
+    <div>
+        {{for x in range(50):}}
+        
+        	<!--<img src="/static/images/lealrlogo.png" />-->
+            <div>
+                <a href="" data-trigger="hover" class="light-tooltip" data-placement="left" title="thread info"><h5>thread title</h5></a>
+            </div>
+        
+        {{pass}}
+    </div>    
+
+</div>
+
+<div id="content">
+
+<h1>{{=thread_by_url[0]['title']}}</h1><hr>
+	
+	<div style="margin-left:15px;">
+        <p class="lead"><a>collections</a></p>
+        		
+		<div style="margin-left:15px;">
+
+            {{collection_list = thread_by_url[0]['collection_name_array']}}
+            <!--{{for collection in collection_list:}}
+            
+            	<a href="/collection/{{=collection}}">{{=collection}}</a>
+            
+            {{pass}}-->
+        
+    	</div>
+	</div>
+    
+    <div style="margin-left:15px;">
+        <p class="lead"><a>tags</a></p>
+		<!--<div style="margin-left:15px;">
+        
+            {{for tag in thread_tag:}}
+            
+				<a href="/tag/{{=tag['tag']}}">{{=tag['tag']}}</a>
+
+            
+            {{pass}}
+
+        </div>-->
+    </div>
+<br>
+
+
+{{thread_content=thread_by_url[0]['thread_content']}}
+    
+    <div id="thread-content">
+    {{=XML(thread_content,
+     
+    sanitize=False,
+     
+    permitted_tags=['a', 'b', 'blockquote', 'br/', 'i', 'li', 'ol', 'ul', 'p', 'cite', 'code', 'pre', 'img/'],
+    
+    allowed_attributes={
+    	
+    	'a':['href', 'title'], 
+    	'img':['src', 'alt'], 
+    	'blockquote':['type']}
+    
+    )}}
+    </div>
+
+<br><br>
+<hr>
+    
+    
+    <a id="expand">comment</a>
+    
+    
+    
+    <div id="form"><br><hr>
+        <div style="padding-left:15px;">
+            {{=form_create_comment_root}}
+        </div>
+    </div>
+    <hr>
+    
+    
+    <script>
+        //$("#form").hide();
+    $("#expand").click(function() {
+		$("#form").slideToggle();
+	});
+
+    </script>
+    
+    {{def comment_crawl(comment_id, margin):}}
+        
+            {{comments_with_parent_id = db((db.thread_comment.parent_comment_id == comment_id) & (db.thread_comment.thread_id == thread_by_url[0]['id'])).select() }}
+            {{for comment in comments_with_parent_id:}}
+    			<div id = "comment-{{=comment['id']}}" style="margin-left:{{=margin}}px;">  
+                    <div id = "comment-user">
+                        {{if comment['user_id'] is None:}}
+                        
+                            <a>anonymous</a><br>
+                        
+                        {{else:}}
+                        
+                            <a>{{=comment['user_id']}}</a><br>
+                        
+                        {{pass}}
+                    </div>
+                    
+                    <div id="comment-content">
+                  
+                        {{=XML(comment['comment_content'],
+                 
+                        sanitize=False,
+                 
+                        permitted_tags=['a', 'b', 'blockquote', 'br/', 'i', 'li', 'ol', 'ul', 'p', 'cite', 'code', 'pre', 'img/'],
+                
+                        allowed_attributes={
+                    
+                            'a':['href', 'title'], 
+                            'img':['src', 'alt'], 
+                            'blockquote':['type']}
+                
+                        )}}
+                    
+                    </div>
+                      
+                    <div style="display:none">
+                        <a style="margin-left:10px;margin-right:10px;" href="">score</a>
+                        <a style="margin-left:10px;margin-right:10px;" href="">dislike</a>   	    
+                        <a style="margin-left:10px;margin-right:10px;" href="">like</a>
+                        <a style="margin-left:10px;margin-right:10px;" href="">share</a>
+                        <a style="margin-left:10px;margin-right:10px;" href="">tag</a><hr>
+                    </div>
+                                        
+					<a style="" id="comment-expand-{{=comment['id']}}">comment</a>
+                                        
+                    <div id="comment-form-{{=comment['id']}}">
+                    
+                    	{{=create_comment_with_id_dict[comment['id']]}}
+
+                    </div>
+                    
+                    <hr>
+                    
+                    <script>
+                        $("#comment-form-{{=comment['id']}}").hide();
+                        $("#comment-expand-{{=comment['id']}}").click(function() {
+                            $("#comment-form-{{=comment['id']}}").slideToggle();
+                        });
+                    </script>
+                    
+                    <div id = "comment-{{=comment['id']}}-children" style="margin-left:15px;" >
+                        {{if comment_crawl(comment['id'], margin) is None:}}
+                        {{else:}}
+                            <a>sort</a>
+                            <a style="float:right;" href="">comment</a><br><br><hr>
+                            <div style="margin-left:10px;">hmm
+                                {{=comment_crawl(comment['id'], margin + 15)}}
+                            </div>
+                        {{pass}}
+                    </div>
+                </div>
+  
+            {{pass}}  
+        
+    {{pass}}
+    
+    
+	{{if comment_crawl('null', 0) is None:}}
+    {{else:}}
+        {{=comment_crawl('null', 0)}}
+    {{pass}}
+
+
+    
+</div>

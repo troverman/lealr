@@ -1,0 +1,168 @@
+{{extend 'layout.html'}}
+<style type="text/css">  
+#content { }
+#right { 
+    width: 255px;
+    float: right;
+    border-left:1px solid rgb(238,238,238);  
+    border-bottom:1px solid rgb(238,238,238);  
+    padding-left:15px;
+    padding-right:15px;
+    padding-bottom:15px;   
+ 
+}
+#left {
+    float: left;
+    width: 175px;
+    border-right:1px solid rgb(238,238,238);
+    border-bottom:1px solid rgb(238,238,238);
+    padding-left:15px;
+    padding-bottom:15px;   
+}
+</style>
+
+{{if request.args(1) is None:}}
+
+    <div id="left">
+    <h5>Left Sidebar</h5>
+        {{for x in range(20):}}
+        <h5>{{=x}}</h5>
+        {{pass}}
+    </div>
+    
+    <div id="right">
+        <h1><a class="btn">invite</a></h1>
+        <h1><a class="btn">join</a></h1>
+        <h1><a class="btn">+new thread</a></h1>
+
+        <h5>collection sidebar</h5>
+        {{for x in range(20):}}
+        <h5>{{=x}}</h5>
+        {{pass}}
+        <h5>collection widget</h5>
+        {{for x in range(5):}}
+        <h5>{{=x}}</h5>
+        {{pass}}
+        <h5>reccomended collections</h5>
+        {{for x in range(5):}}
+        <h5>{{=x}}</h5>
+        {{pass}}
+        <h5>reccomended threads</h5>
+        {{for x in range(5):}}
+        <h5>{{=x}}</h5>
+        {{pass}}
+        <h5>reccomended tags</h5>
+        {{for x in range(5):}}
+        <h5>{{=x}}</h5>
+        {{pass}}
+        <h5>reccomended members</h5>
+        {{for x in range(5):}}
+        <h5>{{=x}}</h5>
+        {{pass}}
+    </div>
+    
+    <div id="content">
+    <h1>
+        {{for title in request.args(0).split('.'):}}
+        {{=title}}
+        {{pass}}
+    </h1>
+    <hr>
+        <a href="/collection/{{=request.args(0)}}/members">members</a>
+        <a href="/collection/{{=request.args(0)}}/usergroups">moderation</a>
+        <a href="/collection/{{=request.args(0)}}/notices">notices</a>
+        <a href="/collection/{{=request.args(0)}}/styles">styles</a>
+        <a href="/collection/{{=request.args(0)}}/settings">settings</a>
+        <a href="/collection/{{=request.args(0)}}/stats">stats</a>
+        <a href="/collection/{{=request.args(0)}}/usergroups">usergroups</a>
+    
+        {{for thread in set_collection_thread_list:}}
+        	<h5><a href="{{=thread['url_title']}}">{{=thread['title']}}</a></h5>
+        {{pass}}  
+    </div>
+
+{{pass}}
+
+{{if request.args(1) == 'members':}}
+	<h3 style="margin-left:15px;">Members</h3><hr>
+	<div id="member-list" style="margin-left:30px;">
+        {{for member in collection_members:}}     
+            {{collection_member=db(db.auth_user.id==member['user_id']).select()[0]['username']}}
+        <h3><a href="/member/{{=collection_member}}">{{=collection_member}}</a></h3>    
+        {{pass}}
+    </div>
+{{pass}}
+
+{{if request.args(1) == 'notices':}}
+    <h3>Notices</h3><hr>
+    <a style="margin-left:15px;">+new notice</a><br><br>
+    {{notice_list=[1,2,3,4,5,6,7,8,9,10]}}
+    <div id="notice-list" style="margin-left:15px;">
+        {{for notice in notice_list:}}
+        <div id="notice-list-item" style="margin-left:15px;">    
+            <h3><a>notice title</a></h3>      
+        </div>
+        {{pass}}
+    </div>
+{{pass}}
+{{if request.args(1) == 'styles':}}
+    <h3>Styles</h3><hr>
+    
+    <h2>Site Defined Styles</h2>
+    style<br>
+    style<br>
+    style<br>
+    style<br>
+    
+    <h2>Custom Styles</h2>
+    preset style<br>
+    preset style<br>
+    preset style<br>
+    preset style<br>
+      
+    style options...
+    templates...
+    
+    post styles... 
+    
+    {{=SQLFORM(db.collection_style)}}
+{{pass}}
+{{if request.args(1) == 'settings':}}
+    <h3>Settings</h3><hr> 
+    description
+    picture 
+    {{=SQLFORM(db.collection)}}
+{{pass}}
+{{if request.args(1) == 'usergroups':}}
+    <h3>Usergroup Permissions</h3><hr>   
+    can usergroup post
+    can usergroup view threads of x usergroup
+    can usergroup vote on threads of x usergroup
+    can usergroup view collection
+    can usergroup delete posts of x usergroup
+    can usergroup edit posts of x usergroup
+    can usergroup comment on threds on x usergroup
+    can usergroup edit collectional title
+	can usergroup edit collectional title of x usergroup
+	can usergroup tag share threads intp collection
+	does usergroup see ads
+	usergroup style
+	usergroup styling options on posts
+	post style options
+    <h4>default guest usergroup</h4><br>
+    <h4>default registered member usergroup</h4><br>
+    <h4>default collection member usergroup</h4><br>
+    
+    <a>+ new usergroup</a>
+    {{=form_create_usergroup}}
+{{pass}}
+{{if request.args(1) == 'moderation':}}
+	<h3>Moderation</h3><hr>
+	send message to members
+	ban member
+	remove member from collection
+	edit member usergroup
+	
+	recent moderation action feed
+	--shows on my collections / feed
+{{pass}}
