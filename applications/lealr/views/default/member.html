@@ -17,7 +17,6 @@
 } 
 </style>
 
-
 <script>
 	$("#member-picture").modal('show');
 	$("#user-likes").modal('show');
@@ -50,7 +49,7 @@ $(document).ready(function() {
 
 <div id="left"><br>
     <div style="width:128px;margin-left:40px;margin-top:10px;">
-		<a data-toggle="modal" href="#member-picture"><img src="/download/{{=db(db.user_avatar.user_id).select()[0]['picture']}}" class="img-polaroid"/></a>
+		<a data-toggle="modal" href="#member-picture"><img src="/download/{{=db(db.member_avatar.user_id).select()[0]['picture']}}" class="img-polaroid"/></a>
     </div>
     <br><br>
     <hr style="margin-left:-15px;">
@@ -65,9 +64,7 @@ $(document).ready(function() {
             <div style="float: right;"><a data-toggle="modal" href="#user-shares">0</a></div>
 		</div>
     </div>
-    
     <hr style="margin-left:-15px;"><br>
-    
     <div id="collections-block" style="">
         <div style="overflow: hidden;">
     		<div style="float: left;"><h4>collections</h4></div>
@@ -76,7 +73,6 @@ $(document).ready(function() {
     </div>
     
     <br><br>
-    
     <div id="following-block" style="">
         <div style="overflow: hidden;">
     		<div style="float: left;"><h4>following</h4></div>
@@ -85,14 +81,12 @@ $(document).ready(function() {
     </div>
     
     <br><br>
-    
     <div id="followers-block" style="">
 		<div style="overflow: hidden;">
     		<div style="float: left;"><h4>followers</h4></div>
             <div style="float: right;"><h4 style="margin-right:15px;"><a data-toggle="modal" href="#user-followers">{{=len(user_followers)}}</a></h4></div>
 		</div><hr style="margin:0px;margin-left:-15px;"><br>
-    </div>
-       
+    </div>     
 </div>
 <div id ="contentwrapper">
 <div id="content"><br>

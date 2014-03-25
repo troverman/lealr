@@ -34,7 +34,14 @@
         <h1><a class="btn">invite</a></h1>
         <h1><a class="btn">join</a></h1>
         <h1><a class="btn">+new thread</a></h1>
-
+        <a href="/collection/{{=request.args(0)}}/members/">members</a><br>
+        <a href="/collection/{{=request.args(0)}}/moderation/">moderation</a><br>
+        <a href="/collection/{{=request.args(0)}}/notices/">notices</a><br>
+        <a href="/collection/{{=request.args(0)}}/styles/">styles</a><br>
+        <a href="/collection/{{=request.args(0)}}/settings/">settings</a><br>
+        <a href="/collection/{{=request.args(0)}}/stats/">stats</a><br>
+        <a href="/collection/{{=request.args(0)}}/membergroups/">membergroups</a><br>
+    
         <h5>collection sidebar</h5>
         {{for x in range(20):}}
         <h5>{{=x}}</h5>
@@ -62,24 +69,19 @@
     </div>
     
     <div id="content">
-    <h1>
+    <h3>
         {{for title in request.args(0).split('.'):}}
         {{=title}}
         {{pass}}
-    </h1>
+    </h3>
     <hr>
-        <a href="/collection/{{=request.args(0)}}/members">members</a>
-        <a href="/collection/{{=request.args(0)}}/usergroups">moderation</a>
-        <a href="/collection/{{=request.args(0)}}/notices">notices</a>
-        <a href="/collection/{{=request.args(0)}}/styles">styles</a>
-        <a href="/collection/{{=request.args(0)}}/settings">settings</a>
-        <a href="/collection/{{=request.args(0)}}/stats">stats</a>
-        <a href="/collection/{{=request.args(0)}}/usergroups">usergroups</a>
-    
-        {{for thread in set_collection_thread_list:}}
-        	<h5><a href="{{=thread['url_title']}}">{{=thread['title']}}</a></h5>
-        {{pass}}  
+        <div id="thread-list" style="margin-left:15px;">
+            {{for thread in set_collection_thread_list:}}
+            	<h4><a href="/thread/{{=thread['url_title']}}">{{=thread['title']}}</a></h4>
+            {{pass}}
+        </div>  
     </div>
+
 
 {{pass}}
 
@@ -133,27 +135,27 @@
     picture 
     {{=SQLFORM(db.collection)}}
 {{pass}}
-{{if request.args(1) == 'usergroups':}}
-    <h3>Usergroup Permissions</h3><hr>   
-    can usergroup post
-    can usergroup view threads of x usergroup
-    can usergroup vote on threads of x usergroup
-    can usergroup view collection
-    can usergroup delete posts of x usergroup
-    can usergroup edit posts of x usergroup
-    can usergroup comment on threds on x usergroup
-    can usergroup edit collectional title
-	can usergroup edit collectional title of x usergroup
-	can usergroup tag share threads intp collection
-	does usergroup see ads
-	usergroup style
-	usergroup styling options on posts
-	post style options
-    <h4>default guest usergroup</h4><br>
-    <h4>default registered member usergroup</h4><br>
-    <h4>default collection member usergroup</h4><br>
+{{if request.args(1) == 'membergroups':}}
+    <h3>membergroups Permissions</h3><hr>   
+    can membergroups post<br>
+    can membergroups view threads of x membergroups<br>
+    can membergoups vote on threads of x membergroups<br>
+    can membergroups view collection<br>
+    can membergroups delete posts of x membergroups<br>
+    can membergroups edit posts of x membergroups<br>
+    can membergroups comment on threds on x membergroups<br>
+    can membergroups edit collectional title<br>
+	can membergroups edit collectional title of x membergroups<br>
+	can membergroups tag share threads intp collection<br>
+	does membergroups see ads<br>
+	membergroups style<br>
+	membergroups styling options on posts<br>
+	post style options<br>
+    <h4>default guest membergroups</h4><br>
+    <h4>default registered member membergroups</h4><br>
+    <h4>default collection member membergroups</h4><br>
     
-    <a>+ new usergroup</a>
+    <a>+ new membergroups</a>
     {{=form_create_usergroup}}
 {{pass}}
 {{if request.args(1) == 'moderation':}}
@@ -166,3 +168,6 @@
 	recent moderation action feed
 	--shows on my collections / feed
 {{pass}}
+
+<div style="clear: both"></div>
+

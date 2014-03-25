@@ -73,13 +73,13 @@
     img.img-polaroid:hover{border:1px solid rgb(100,100,100);}       
     a:hover{text-decoration:none;}      
     .modal.fade {
-      top: 20%;
+      top: 7%;
       -webkit-transition: opacity 0.3s linear;
       -moz-transition: opacity 0.3s linear;
       -o-transition: opacity 0.3s linear;
       transition: opacity 0.3s linear;
     }
-    .modal.fade.in {top: 20%;}
+    .modal.fade.in {top: 7%;}
     #navbar.nav.pull-right.nav_bar.open{background-color:rgb(76,80,89);}
     //UL#navbar.nav.pull-right.nav_bar{background-image: linear-gradient(to bottom, rgb(66, 70, 79), rgb(65, 69, 78));}
     UL#navbar.nav.pull-right.nav_bar:hover{background-color:rgb(76,80,89);}
@@ -145,7 +145,7 @@
   <!-- container ================================================== -->
   <div class="container" style="background-color:rgb(245,245,245);"> 
     <!-- navbar ================================================== -->
-    <div class="navbar navbar-inverse navbar-static-top">
+    <div class="navbar navbar-inverse navbar-static-top" style="min-width:1056px;">
       <div class="flash">{{=response.flash or ''}}</div>
       <div class="navbar-inner" style="background-image: linear-gradient(to bottom, rgb(66, 70, 79), rgb(65, 69, 78));border-bottom:3px solid rgb(210,210,210);">
         <div class="container">
@@ -197,12 +197,12 @@
                   {{pass}}   
                   <a href="/feed" id="feed-icon"><i id="feed-icon_icon" class="icon-align-justify"></i></a>
                 {{pass}} 
-          </div> 
+          </div>
         </div>
           {{if session.auth is None:}}
-            <ul id="navbar" class="nav pull-right brand" style="margin-top:8px;">
+            <ul id="navbar" class="nav pull-right brand" style="margin-top:12px;">
               <a data-toggle="modal" href="#login-or-signup" id="login-area">
-                <b>Login or Signup</b>
+                login or signup
               </a>
             </ul>
           {{else:}}
@@ -238,6 +238,15 @@
               <a href="/inbox" id="mail-icon"><i id="mail-icon_icon" class="icon-envelope"></i></a>
             </div>
           {{pass}}
+          <div id="new-post-area" style="float:right;margin-right:10%;margin-top:4px;">
+            <i class="btn icon-edit"></i>
+          </div>
+          <div id="search-bar" style="float:right;margin-right:30px;margin-top:9px;">
+            <div class="input-prepend">
+              <span class="add-on"><i class="icon-search"></i></span>
+              <input class="span2" id="prependedInput" type="text" placeholder="search">
+            </div>    
+          </div> 
         </div>
       </div>
     </div>

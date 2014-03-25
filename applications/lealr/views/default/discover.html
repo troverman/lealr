@@ -22,24 +22,18 @@
 </style>
 
 <script>
-function onAddTag_collcetion(tag) {
+function onAddTag_discover_interest(tag) {
 
-	ajax('ajax_add_tag_collection', ['collection_add_tag_form'], ':eval');
-
-}
-
-function onAddTag_sidebar(tag) {
-
-	plus_or_minus(tag);
+	ajax('ajax_add_discover_interest', ['discover_interest_form'], ':eval');
 
 }
 
 $(document).ready(function() {
 
-	$('#sidebar_add_tag_form').tagsInput({
+	$('#discover_interest_form').tagsInput({
         	
-         onAddTag:onAddTag_sidebar,
-         onRemoveTag:onAddTag_sidebar,
+         onAddTag:onAddTag_discover_interest,
+         onRemoveTag:onAddTag_discover_interest,
        
         'defaultText':'interests',
         'width':'auto',
@@ -52,6 +46,9 @@ $(document).ready(function() {
 	$("#close-ad").click(function() {		
 		$("#ad_block").fadeToggle();		
 	});
+    $("#close-related-interests").click(function() {       
+        $("#related-interests").fadeToggle();        
+    });
 });
 
 
@@ -70,21 +67,27 @@ $(document).ready(function() {
 </div>
 
 <div id="content">
-	<h1>Discover</h1><hr>
-	discover content
-	<div style="margin-right:16px;" id="div_sidebar_add_tag"><input name = "sidebar_add_tag" type="text" id="sidebar_add_tag_form" /></div><br>   
-	<div class="well">
+	<h3>Discover</h3><a href=""><i class="btn icon-random" style="float:right;"></i></a><hr>
+    <div style="margin-right:16px;" id="div_discover_interest"><input name = "discover_interest" type="text" id="discover_interest_form" /></div><br>   
+
+	<div class="well" id="related-interests">
+        <a class="close" id="close-related-interests" href="#">&times;</a>
         related collections...tags...users..posts... etc
+        trending collections..tags..etc
         {{for x in range(5):}}
-            <h5>related {{=x}}</h5>
+            <h5>related interest {{=x}}</h5>
         {{pass}}   
     </div>
     
-    <button class="btn">discover</button>
+    <p class="lead">filters</p>
+    <p>filter type</p>
     
-    
-    
-    <br><hr>
+    <p class="btn">post</p>
+    <p class="btn">list</p>
+    <p class="btn">grid</p>
+
+
+    <hr>
     
 	<div style="border:1px solid rgb(235,235,235);background-color:rgb(246,250,255);padding:15px;" id="ad_block">
     	<a class="close" id="close-ad" href="#">&times;</a>
@@ -93,11 +96,14 @@ $(document).ready(function() {
             <a href="/thread/{{=thread['url_title']}}"><h5>{{=thread['title']}}</h5></a>
             {{pass}}          
         </div>
-    <br></div>
-    
-    {{for x in range(50):}}
-    <a><h4>thread {{=x}}</h4></a>
+    <br>
+    </div>
+
+    <div id="discover-block">
+    {{for x in range(10):}}
+        <a><h4>thread {{=x}}</h4></a>
     {{pass}}
+    </div>
 
     
 </div>

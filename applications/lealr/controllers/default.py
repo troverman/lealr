@@ -346,22 +346,27 @@ def thread():
     thread_comments = db(db.thread_comment.thread_id == thread_by_url[0]['id']).select()
     for comment in thread_comments:  
         create_comment_with_id_dict[comment['id']] = SQLFORM(db.thread_comment)
-        if create_comment_with_id_dict[comment['id']].process(formname='create_comment_with_id_dict' + str(comment['id'])).accepted:  
-            db(db.thread_comment.id==form_create_comment_root.vars.id).update(user_id=auth.user_id)
-            db(db.thread_comment.id==form_create_comment_root.vars.id).update(thread_id=thread_by_url[0]['id'])
-            db(db.thread_comment.id==form_create_comment_root.vars.id).update(parent_comment_id=comment['id'])
+        if create_comment_with_id_dict[comment['id']].process(formname='create_comment_with_id_dict' + str(comment['id'])).accepted: 
+            db(db.thread_comment.id==create_comment_with_id_dict[comment['id']].vars.id).update(user_id=auth.user_id)
+            db(db.thread_comment.id==create_comment_with_id_dict[comment['id']].vars.id).update(thread_id=thread_by_url[0]['id'])
+            db(db.thread_comment.id==create_comment_with_id_dict[comment['id']].vars.id).update(parent_comment_id=comment['id'])
             session.flash = 'Commented'
             redirect(URL('/thread/' + request.args(0)))
-                
         elif create_comment_with_id_dict[comment['id']].errors:
             session.flash = 'Error'   
             redirect(URL(''))
+
+    similar_threads = db(db.thread).select()
+    promoted_thread_array = db(db.thread.collection_name_array.contains('promotion')).select() 
+
         
     return dict(
     create_comment_with_id_dict=create_comment_with_id_dict,
     form_create_comment_root=form_create_comment_root,
     thread_by_url=thread_by_url,
     thread_tag=thread_tag,
+    similar_threads=similar_threads,
+    promoted_thread_array=promoted_thread_array,
     )
      
 ################################
@@ -420,13 +425,20 @@ def ajax_like_thread():
     #thread_dislikes = len(db(db.thread_dislike.thread_id == thread_id_trim).select())
     #like_dislike_difference = thread_likes - thread_dislikes
     jquery=''
-    if not thread_dislike:
-        hi=''
-    else:
-        jquery += "$('#thread-item-disliked-%s').fadeToggle(100);" % thread_id_trim
-        jquery += "$('#thread-item-dislike-%s').delay(100).fadeToggle(400);" % thread_id_trim
+    if thread_dislike:
+        thread_dislike_id = db((db.thread_dislike.thread_id == thread_id_trim) & (db.thread_dislike.user_id == auth.user_id)).select()[0]['id']    
+        db(db.thread_dislike.id == thread_dislike_id).delete()
+        like_html = SPAN('dislike',_style='color:rgb(100,140,100);', _onclick="ajax('ajax_dislike_thread'," + "['thread_dislike-" + str(thread_id_trim) + "'], ':eval');")
+
+        jquery += "$('#thread-item-dislike-%s').delay(0).html('%s');" % (thread_id_trim,dislike_html)
+        #jquery += "$('#thread-item-like-%s').delay(0).html('%s');" % (thread_id_trim,dislike_html)
+
     jquery += "$('#thread-item-like-%s').fadeToggle(100);" % thread_id_trim
-    jquery += "$('#thread-item-liked-%s').delay(100).fadeToggle(400);" % thread_id_trim
+    like_html = SPAN('liked',_style='color:rgb(100,140,100);') + FORM(INPUT(_id="thread_un_like",_name="thread_un_like-"+str(thread_id_trim),_value=str(thread_id_trim),_type="type"),_style="display:none") + P('x', _onclick="ajax('ajax_un_like_thread'," + "['thread_un_like-" + str(thread_id_trim) + "'], ':eval');")
+
+
+
+    jquery += "$('#thread-item-like-%s').delay(0).fadeToggle(100).html('%s');" % (thread_id_trim,like_html)
     jquery += "$('#thread-%s-score').text('+1');" % thread_id_trim
     jquery += "$('#thread-%s-score').css('color', 'rgb(100,140,100)');" % thread_id_trim
 
@@ -441,8 +453,10 @@ def ajax_un_like_thread():
         thread_id_trim = int(x)
     thread_like_id = db((db.thread_like.thread_id == thread_id_trim) & (db.thread_like.user_id == auth.user_id)).select()[0]['id']    
     db(db.thread_like.id == thread_like_id).delete()
-    jquery = "$('#thread-item-liked-%s').fadeToggle(100);" % thread_id_trim
-    jquery += "$('#thread-item-like-%s').delay(100).fadeToggle(400);" % thread_id_trim
+    jquery = "$('#thread-item-like-%s').fadeToggle(100);" % thread_id_trim
+    like_html = SPAN('like',_style='color:rgb(100,140,100);', _onclick="ajax('ajax_like_thread'," + "['thread_like-" + str(thread_id_trim) + "'], ':eval');")
+
+    jquery += "$('#thread-item-like-%s').delay(0).fadeToggle(100).html('%s');" % (thread_id_trim, like_html)
     jquery += "$('#thread-%s-score').text('0');" % thread_id_trim
     return jquery
     
@@ -457,13 +471,17 @@ def ajax_dislike_thread():
     #check if already liked
     thread_like = db((db.thread_like.thread_id == thread_id_trim) & (db.thread_like.user_id == auth.user_id)).select()             
     jquery=''
-    if not thread_like:
-        hi=''
-    else:
-        jquery += "$('#thread-item-liked-%s').fadeToggle(100);" % thread_id_trim
-        jquery += "$('#thread-item-like-%s').delay(100).fadeToggle(400);" % thread_id_trim
+    if thread_like:
+        thread_like_id = db((db.thread_like.thread_id == thread_id_trim) & (db.thread_like.user_id == auth.user_id)).select()[0]['id']    
+        db(db.thread_like.id == thread_like_id).delete()
+        like_html = SPAN('like',_style='color:rgb(100,140,100);', _onclick="ajax('ajax_like_thread'," + "['thread_like-" + str(thread_id_trim) + "'], ':eval');")
+
+        jquery += "$('#thread-item-like-%s').delay(0).html('%s');" % (thread_id_trim,like_html)
+
     jquery += "$('#thread-item-dislike-%s').fadeToggle(100);" % thread_id_trim
-    jquery += "$('#thread-item-disliked-%s').delay(100).fadeToggle(400);" % thread_id_trim
+    dislike_html = SPAN('disliked',_style='color:rgb(100,140,100);') + FORM(INPUT(_id="thread_un_dislike",_name="thread_un_dislike-"+str(thread_id_trim),_value=str(thread_id_trim),_type="type"),_style="display:none") + P('x', _onclick="ajax('ajax_un_dislike_thread'," + "['thread_un_dislike-" + str(thread_id_trim) + "'], ':eval');")
+
+    jquery += "$('#thread-item-dislike-%s').delay(0).fadeToggle(100).html('%s');" % (thread_id_trim,dislike_html)
     jquery += "$('#thread-%s-score').text('-1');" % thread_id_trim
     jquery += "$('#thread-%s-score').css('color', 'rgb(100,80,100)');" % thread_id_trim
     return jquery
@@ -478,10 +496,12 @@ def ajax_un_dislike_thread():
     thread_dislike_id = db((db.thread_dislike.thread_id == thread_id_trim) & (db.thread_dislike.user_id == auth.user_id)).select()[0]['id']    
     db(db.thread_dislike.id == thread_dislike_id).delete()
          
-    jquery = "$('#thread-item-disliked-%s').fadeToggle(100);" % thread_id_trim
-    jquery += "$('#thread-item-dislike-%s').delay(100).fadeToggle(400);" % thread_id_trim
+    jquery = "$('#thread-item-dislike-%s').fadeToggle(100);" % thread_id_trim
+    dislike_html = SPAN('dislike',_style='color:rgb(100,140,100);', _onclick="ajax('ajax_dislike_thread'," + "['thread_dislike-" + str(thread_id_trim) + "'], ':eval');")
+
+    jquery += "$('#thread-item-like-%s').delay(0).fadeToggle(100).html('%s');" % (thread_id_trim, dislike_html)
     jquery += "$('#thread-%s-score').text('0');" % thread_id_trim
-    return jquery    
+    return jquery   
 
 ################################
 ####ajax_join_collection########
@@ -558,6 +578,18 @@ def ajax_autocomplete_collections_tag():
     return dict()
 
 ################################
+####ajax_add_discover_interest##
+################################         
+def ajax_add_discover_interest():
+    interest_array = request.vars.discover_interest
+    session.interest_array = interest_array 
+    test1 = DIV(interest_array, XML('<b>world</b>'), _id=0, _class='well')
+    jquery = "jQuery('#discover-block').html('%s');" % test1
+    jquery += "jQuery('#related-interests').html('%s');" % test1
+
+    return jquery
+
+################################
 ####ajax_add_tag_sidebar########
 ################################         
 def ajax_add_tag_sidebar():
@@ -572,10 +604,13 @@ def ajax_add_tag_sidebar():
 ####ajax_add_collection_sidebar#
 ################################                         
 def ajax_add_collection_sidebar():
+    #check if thread is liked
+    #check if logged in so can like
     collections = request.vars.sidebar_add_collection
     session.collections_sidebar = collections   
     collection_list = session.collections_sidebar.split(',')
-    collection_thread_list = []         
+    collection_thread_list = [] 
+    #contains is wrong... need to iterate through and check.        
     for collection in collection_list:
         collection_thread_list.append(db(db.thread.collection_name_array.contains(collection)).select())
 
@@ -593,7 +628,14 @@ def ajax_add_collection_sidebar():
     title_array = [] 
     collections_thread_array = [] 
     the_collections_thread_array = []
+    the_collections_thread_tag_array = []
     for count, thread in enumerate(set_collection_thread_list):
+        the_collections_thread_tag_array.append([])
+        collections_thread_array.append(thread['collection_name_array'])
+        for collection in collections_thread_array[count]:
+            the_collections_thread_array.append(collection) 
+        for tag in db(db.thread_tag.thread_id == thread['id']).select():
+            the_collections_thread_tag_array[count].append(tag)
         title_array.append(
             TABLE(
                    TR(
@@ -608,7 +650,8 @@ def ajax_add_collection_sidebar():
                                 DIV(A('x comments', _style='margin-left:15px;margin-top:10px'), _id='thread-views'),
                                 DIV(A('x views', _style='margin-left:15px;margin-top:10px;'), _id='thread-views')
                             
-                            )
+                            ),
+                            DIV(P('collections') +P(the_collections_thread_array[count])+P('tags') +P(the_collections_thread_tag_array[count]))
                             ,_style='width:100%'
                         ),
                         TD( 
@@ -619,23 +662,23 @@ def ajax_add_collection_sidebar():
                             ),
                             H5(A('share'), _style='float:right;margin-right:15px;')
                         )
-                    ),
-                    TR(TD(H5(A('collections')+A('tags'))))
+                    )
                ,_style='table-layout: fixed;')
-           )
-        collections_thread_array.append(thread['collection_name_array'])
-        for collection in collections_thread_array[count]:
-            the_collections_thread_array.append(collection)    
+           )  
     test = BR() + HR()
     test1 = DIV()
     for title in title_array:
         test += DIV(title, XML(''), _id='thread-list-item', style='width:100%') + HR()
     for collection in set(the_collections_thread_array):
         test1 += DIV(A(collection, _href='/collection/'+ collection), A(the_collections_thread_array.count(collection), _href='/collection/'+ collection), XML(''), _id='test') + HR()
-        
+    #for tag in set(the_collections_thread_tag_array):
+        #test2 += DIV(A(tag, _href='/tag/'+ tag), A(the_collections_thread_tag_array.count(tag), _href='/collection/'+ tag), XML(''), _id='test') + HR()
+
 
     jquery = "jQuery('#thread-list').html('%s');" % test
     jquery += "jQuery('#collection-list').html('%s');" % test1
+    #jquery += "jQuery('#tag-list').html('%s');" % test2
+
     return jquery
       
 ################################
@@ -664,6 +707,29 @@ def ajax_add_tag_collection():
     session.collection_tag = tags 
     jquery = "jQuery('.flash').html('%s').slideDown().delay(1000).slideUp();" % session.collection_tag
     return jquery
+
+################################
+####ajax_expand_thread##########
+################################     
+def ajax_expand_thread():
+    thread_id = request.vars.itervalues()
+    for x in thread_id:
+        thread_id_trim = int(x)
+    thread = db(db.thread.id == thread_id_trim).select()[0]
+
+    test = BR()
+    test += DIV(DIV(XML(thread['thread_content']), _style='display:inline-block;margin-left:15px;margin-right:15px;'), _id='thread-content-'+str(thread_id_trim) , _style='width:100%;') + BR()
+    test += DIV(P(A('comment',_style='display:inline-block;margin-left:15px;')) + P(A('view comments', _style='display:inline-block;margin-left:15px;'))) 
+    test += HR()
+
+    #jquery = "$('#thread-content-%s').remove();"
+    jquery = "$('#thread-list-item-%s').append('%s');" % (thread_id_trim, test)
+    return jquery
+
+
+
+
+
             
 ################################
 ####ajax_reset_collection_tags_session_thread
@@ -672,3 +738,5 @@ def ajax_reset_collection_tags_session_thread():
    session.collection_thread = '' 
    session.tag_thread = ''
    return dict()
+
+   

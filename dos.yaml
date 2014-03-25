@@ -1,0 +1,15 @@
+blacklist:
+- subnet: 96.47.225.66
+  description: stupid spammer
+- subnet: 96.47.225.82
+  description: stupid spammer1
+- subnet: 96.47.225.170
+  description: stupid spammer2
+- subnet: 96.47.225.178
+  description: stupid spammer3
+- subnet: 96.47.224.218
+  description: stupid spammer4
+- subnet: 96.47.225.186
+  description: stupid spammer5
+- subnet: 96.47.225.74
+  description: stupid spammer5

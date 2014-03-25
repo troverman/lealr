@@ -4,18 +4,14 @@
 ## be redirected to HTTPS, uncomment the line below:
 # request.requires_https()
 
-if not request.env.web2py_runtime_gae:
-    ## if NOT running on Google App Engine use SQLite or other DB
-    db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['all'])
-else:
-    ## connect to Google BigTable (optional 'google:datastore://namespace')
-    db = DAL('google:datastore')
-    ## store sessions and tickets there
-    session.connect(request, response, db=db)
-    ## or store session in Memcache, Redis, etc.
-    ## from gluon.contrib.memdb import MEMDB
-    ## from google.appengine.api.memcache import Client
-    ## session.connect(request, response, db = MEMDB(Client()))
+## connect to Google BigTable (optional 'google:datastore://namespace')
+db = DAL('google:datastore')
+## store sessions and tickets there
+session.connect(request, response, db=db)
+## or store session in Memcache, Redis, etc.
+## from gluon.contrib.memdb import MEMDB
+## from google.appengine.api.memcache import Client
+## session.connect(request, response, db = MEMDB(Client()))
 
 ## by default give a view/generic.extension to all actions from localhost
 ## none otherwise. a pattern can be 'controller/function.extension'
@@ -48,7 +44,7 @@ auth.settings.reset_password_requires_verification = True
 ####thread######################
 ################################ 
 db.define_table('thread',
-    Field('user_id','reference auth_user', default=auth.user_id, readable=False, writable=False),
+    Field('user_id','string', readable=False, writable=False),
     Field('title','string', length=120),
     Field('url_title', readable=False, writable=False),
     Field('thread_content','text'),
@@ -92,6 +88,7 @@ db.define_table('thread_comment',
 db.define_table('thread_tag',
     Field('thread_id','reference thread'),
     Field('tag','string'),
+    Field('user_id','string'),
 )
 
 ################################
@@ -119,6 +116,8 @@ db.define_table('collection_picture',
 db.define_table('collection_tag',
     Field('collection_id','string'),
     Field('tag','string'),
+    Field('user_id','string'),
+
 )
 
 ################################
@@ -127,23 +126,24 @@ db.define_table('collection_tag',
 db.define_table('collection_member',
     Field('user_id','reference auth_user', default=auth.user_id, readable=False, writable=False),
     Field('collection_id','reference collection'),
-    Field('collection_usergroup_id','string'),
+    Field('collection_membergroup_id_array','list:string'),
 )
 
 ################################
-####collection_usergroup########
+####collection_membergroup########
 ################################
-db.define_table('collection_usergroup',
+db.define_table('collection_membergroup',
     Field('collection_id','integer'),
+    Field('title','string'),
     Field('description','string'),
 )
 
 ################################
-####collection_usergroup_permissions
+####collection_membergroup_permissions
 ################################
-db.define_table('collection_usergroup_permissions',
+db.define_table('collection_membergroup_permissions',
     Field('collection_id','reference collection'),
-    Field('collection_usergroup_id','reference collection_usergroup'),
+    Field('collection_membergroup_id','reference collection_membergroup'),
     Field('permissions','string'),
 )
 
@@ -155,6 +155,16 @@ db.define_table('collection_style',
     Field('title','string'),
     Field('description','string'),
     Field('collection_style','string')
+)
+
+         
+################################
+####member_avatar###############
+################################
+db.define_table('member_avatar',
+    Field('user_id', 'string'),
+    Field('picture', 'upload', uploadfield='picture_file'),
+    Field('picture_file', 'blob')
 )
 
 ################################
@@ -194,16 +204,6 @@ db.define_table('feed_post',
     
 )
 
-         
-################################
-####user_avatar#################
-################################
-db.define_table('user_avatar',
-    Field('user_id', 'reference auth_user', default=auth.user_id, readable=False, writable=False),
-    Field('picture', 'upload', uploadfield='picture_file'),
-    Field('picture_file', 'blob')
-    
-)
     
 db.auth_user.first_name.readable = db.auth_user.first_name.writable = False
 db.auth_user.last_name.readable = db.auth_user.last_name.writable = False 
